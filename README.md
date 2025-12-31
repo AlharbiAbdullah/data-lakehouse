@@ -294,10 +294,6 @@ LIMIT 10;
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-## Author
-
-**Abdullah Al Harbi** - Data & AI Engineer
-
 ---
 
 *Built with DuckDB, dbt, and Python*
