@@ -8,16 +8,18 @@ with source as (
     select * from {{ source('raw', 'fhv_tripdata') }}
 ),
 
-staged as (
+with_base_hash as (
     select
-        -- Deterministic trip ID (FHV doesn't have fare, use 0)
+        -- Base hash from key fields (FHV has base numbers instead of fare)
         {{ generate_trip_id(
             'pickup_datetime',
             'dropOff_datetime',
             'PULocationID',
             'DOLocationID',
-            '0'
-        ) }} as trip_id,
+            'dispatching_base_num',
+            'Affiliated_base_number',
+            'SR_Flag'
+        ) }} as base_hash,
 
         -- Trip type identifier
         'fhv' as trip_type,
@@ -43,6 +45,14 @@ staged as (
 
     from source
     where pickup_datetime is not null
+),
+
+staged as (
+    select
+        -- Unique trip ID: base_hash + row number for duplicates
+        base_hash || '_' || cast(row_number() over (partition by base_hash order by pickup_datetime) as varchar) as trip_id,
+        * exclude (base_hash)
+    from with_base_hash
 )
 
 select * from staged

@@ -8,16 +8,18 @@ with source as (
     select * from {{ source('raw', 'yellow_tripdata') }}
 ),
 
-staged as (
+with_base_hash as (
     select
-        -- Deterministic trip ID
+        -- Base hash from key fields
         {{ generate_trip_id(
             'tpep_pickup_datetime',
             'tpep_dropoff_datetime',
             'PULocationID',
             'DOLocationID',
-            'fare_amount'
-        ) }} as trip_id,
+            'fare_amount',
+            'trip_distance',
+            'passenger_count'
+        ) }} as base_hash,
 
         -- Trip type identifier
         'yellow' as trip_type,
@@ -55,6 +57,14 @@ staged as (
     from source
     where tpep_pickup_datetime is not null
       and tpep_dropoff_datetime is not null
+),
+
+staged as (
+    select
+        -- Unique trip ID: base_hash + row number for duplicates
+        base_hash || '_' || cast(row_number() over (partition by base_hash order by pickup_datetime) as varchar) as trip_id,
+        * exclude (base_hash)
+    from with_base_hash
 )
 
 select * from staged
