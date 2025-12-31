@@ -1,0 +1,13 @@
+nyc_taxi_lakehouse:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: "../data/warehouse/lakehouse.duckdb"
+      threads: 4
+
+    # CI profile for GitHub Actions (uses in-memory database)
+    ci:
+      type: duckdb
+      path: "../data/warehouse/lakehouse.duckdb"
+      threads: 2

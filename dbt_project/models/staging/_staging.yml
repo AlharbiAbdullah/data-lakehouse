@@ -1,0 +1,123 @@
+version: 2
+
+models:
+  - name: stg_yellow_trips
+    description: Staged yellow taxi trips with standardized column names and deterministic IDs
+    columns:
+      - name: trip_id
+        description: Deterministic trip ID (MD5 hash of key fields)
+        tests:
+          - unique
+          - not_null
+      - name: trip_type
+        description: Type of taxi service
+        tests:
+          - accepted_values:
+              values: ["yellow"]
+      - name: pickup_datetime
+        description: Pickup timestamp
+        tests:
+          - not_null
+      - name: dropoff_datetime
+        description: Dropoff timestamp
+        tests:
+          - not_null
+      - name: pickup_zone_id
+        description: Pickup location zone ID
+      - name: dropoff_zone_id
+        description: Dropoff location zone ID
+      - name: passenger_count
+        description: Number of passengers
+      - name: trip_distance
+        description: Trip distance in miles
+      - name: fare_amount
+        description: Base fare amount
+      - name: tip_amount
+        description: Tip amount
+      - name: total_amount
+        description: Total fare including all charges
+
+  - name: stg_green_trips
+    description: Staged green taxi trips with standardized column names and deterministic IDs
+    columns:
+      - name: trip_id
+        description: Deterministic trip ID (MD5 hash of key fields)
+        tests:
+          - unique
+          - not_null
+      - name: trip_type
+        description: Type of taxi service
+        tests:
+          - accepted_values:
+              values: ["green"]
+      - name: pickup_datetime
+        description: Pickup timestamp
+        tests:
+          - not_null
+      - name: dropoff_datetime
+        description: Dropoff timestamp
+        tests:
+          - not_null
+      - name: pickup_zone_id
+        description: Pickup location zone ID
+      - name: dropoff_zone_id
+        description: Dropoff location zone ID
+      - name: passenger_count
+        description: Number of passengers
+      - name: trip_distance
+        description: Trip distance in miles
+      - name: fare_amount
+        description: Base fare amount
+      - name: tip_amount
+        description: Tip amount
+      - name: total_amount
+        description: Total fare including all charges
+
+  - name: stg_fhv_trips
+    description: Staged for-hire vehicle trips with standardized column names and deterministic IDs
+    columns:
+      - name: trip_id
+        description: Deterministic trip ID (MD5 hash of key fields)
+        tests:
+          - unique
+          - not_null
+      - name: trip_type
+        description: Type of taxi service
+        tests:
+          - accepted_values:
+              values: ["fhv"]
+      - name: pickup_datetime
+        description: Pickup timestamp
+        tests:
+          - not_null
+      - name: dropoff_datetime
+        description: Dropoff timestamp
+      - name: pickup_zone_id
+        description: Pickup location zone ID
+      - name: dropoff_zone_id
+        description: Dropoff location zone ID
+      - name: dispatching_base_num
+        description: TLC Base License Number of dispatching base
+      - name: affiliated_base_num
+        description: TLC Base License Number of affiliated base
+      - name: is_shared_ride
+        description: Whether this was a shared ride
+
+  - name: stg_taxi_zones
+    description: Staged taxi zone lookup table
+    columns:
+      - name: zone_id
+        description: Unique zone identifier
+        tests:
+          - unique
+          - not_null
+      - name: borough
+        description: NYC borough name
+        tests:
+          - not_null
+      - name: zone_name
+        description: Zone/neighborhood name
+        tests:
+          - not_null
+      - name: service_zone
+        description: Service zone classification

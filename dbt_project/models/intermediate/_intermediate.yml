@@ -1,0 +1,88 @@
+version: 2
+
+models:
+  - name: int_trips_unioned
+    description: All taxi trips (yellow, green, FHV) unioned with standardized schema
+    columns:
+      - name: trip_id
+        description: Deterministic trip ID
+        tests:
+          - unique
+          - not_null
+      - name: trip_type
+        description: Type of taxi service (yellow, green, fhv)
+        tests:
+          - not_null
+          - accepted_values:
+              values: ["yellow", "green", "fhv"]
+      - name: pickup_datetime
+        description: Pickup timestamp
+        tests:
+          - not_null
+      - name: dropoff_datetime
+        description: Dropoff timestamp
+      - name: pickup_zone_id
+        description: Pickup location zone ID
+      - name: dropoff_zone_id
+        description: Dropoff location zone ID
+      - name: passenger_count
+        description: Number of passengers (null for FHV)
+      - name: trip_distance
+        description: Trip distance in miles (null for FHV)
+      - name: fare_amount
+        description: Base fare amount (null for FHV)
+      - name: tip_amount
+        description: Tip amount (null for FHV)
+      - name: total_amount
+        description: Total fare including all charges (null for FHV)
+
+  - name: int_trips_enriched
+    description: Trips enriched with zone information and calculated fields
+    columns:
+      - name: trip_id
+        description: Deterministic trip ID
+        tests:
+          - unique
+          - not_null
+      - name: trip_type
+        description: Type of taxi service
+        tests:
+          - not_null
+      - name: pickup_zone_name
+        description: Name of pickup zone
+      - name: pickup_borough
+        description: Borough of pickup location
+      - name: dropoff_zone_name
+        description: Name of dropoff zone
+      - name: dropoff_borough
+        description: Borough of dropoff location
+      - name: trip_duration_minutes
+        description: Trip duration in minutes
+      - name: avg_speed_mph
+        description: Average speed during trip (miles per hour)
+      - name: tip_percentage
+        description: Tip as percentage of fare
+
+  - name: int_trips_validated
+    description: Validated trips with outliers and invalid records removed
+    columns:
+      - name: trip_id
+        description: Deterministic trip ID
+        tests:
+          - unique
+          - not_null
+      - name: trip_type
+        description: Type of taxi service
+        tests:
+          - not_null
+      - name: trip_duration_minutes
+        description: Trip duration in minutes (validated > 0 and < 180)
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 180
+              inclusive: false
+      - name: fare_amount
+        description: Base fare amount (validated > 0 for yellow/green)
+      - name: trip_distance
+        description: Trip distance in miles (validated >= 0)

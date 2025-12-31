@@ -1,0 +1,114 @@
+version: 2
+
+sources:
+  - name: raw
+    description: Raw NYC Taxi trip data loaded from parquet files
+    schema: raw
+    tables:
+      - name: yellow_tripdata
+        description: Yellow taxi trip records
+        columns:
+          - name: VendorID
+            description: Code indicating the TPEP provider (1=Creative Mobile, 2=VeriFone)
+          - name: tpep_pickup_datetime
+            description: Date and time when the meter was engaged
+          - name: tpep_dropoff_datetime
+            description: Date and time when the meter was disengaged
+          - name: passenger_count
+            description: Number of passengers in the vehicle
+          - name: trip_distance
+            description: Trip distance in miles
+          - name: PULocationID
+            description: TLC Taxi Zone for pickup location
+          - name: DOLocationID
+            description: TLC Taxi Zone for dropoff location
+          - name: RatecodeID
+            description: Final rate code in effect at end of trip
+          - name: store_and_fwd_flag
+            description: Whether trip record was held in memory (Y/N)
+          - name: payment_type
+            description: Payment method (1=Credit, 2=Cash, 3=No charge, 4=Dispute)
+          - name: fare_amount
+            description: Time-and-distance fare calculated by meter
+          - name: extra
+            description: Miscellaneous extras and surcharges
+          - name: mta_tax
+            description: MTA tax automatically triggered
+          - name: improvement_surcharge
+            description: Improvement surcharge assessed on hailed trips
+          - name: tip_amount
+            description: Tip amount (auto-populated for credit card tips)
+          - name: tolls_amount
+            description: Total amount of all tolls paid
+          - name: total_amount
+            description: Total amount charged to passengers
+
+      - name: green_tripdata
+        description: Green taxi trip records (outer boroughs)
+        columns:
+          - name: VendorID
+            description: Code indicating the LPEP provider
+          - name: lpep_pickup_datetime
+            description: Date and time when the meter was engaged
+          - name: lpep_dropoff_datetime
+            description: Date and time when the meter was disengaged
+          - name: passenger_count
+            description: Number of passengers in the vehicle
+          - name: trip_distance
+            description: Trip distance in miles
+          - name: PULocationID
+            description: TLC Taxi Zone for pickup location
+          - name: DOLocationID
+            description: TLC Taxi Zone for dropoff location
+          - name: RatecodeID
+            description: Final rate code in effect at end of trip
+          - name: store_and_fwd_flag
+            description: Whether trip record was held in memory (Y/N)
+          - name: payment_type
+            description: Payment method
+          - name: fare_amount
+            description: Time-and-distance fare calculated by meter
+          - name: extra
+            description: Miscellaneous extras and surcharges
+          - name: mta_tax
+            description: MTA tax automatically triggered
+          - name: improvement_surcharge
+            description: Improvement surcharge
+          - name: tip_amount
+            description: Tip amount
+          - name: tolls_amount
+            description: Total amount of all tolls paid
+          - name: total_amount
+            description: Total amount charged to passengers
+          - name: trip_type
+            description: Trip type (1=Street-hail, 2=Dispatch)
+
+      - name: fhv_tripdata
+        description: For-hire vehicle trip records
+        columns:
+          - name: dispatching_base_num
+            description: TLC Base License Number of the dispatching base
+          - name: pickup_datetime
+            description: Date and time of trip pickup
+          - name: dropOff_datetime
+            description: Date and time of trip dropoff
+          - name: PULocationID
+            description: TLC Taxi Zone for pickup location
+          - name: DOLocationID
+            description: TLC Taxi Zone for dropoff location
+          - name: SR_Flag
+            description: Shared ride flag (1=shared ride)
+          - name: Affiliated_base_number
+            description: TLC Base License Number of affiliated base
+
+      - name: taxi_zones
+        description: Taxi zone lookup table
+        columns:
+          - name: LocationID
+            description: Unique identifier for the zone
+          - name: Borough
+            description: NYC borough name
+          - name: Zone
+            description: Zone name/neighborhood
+          - name: service_zone
+            description: Service zone type (Yellow Zone, Boro Zone, etc.)

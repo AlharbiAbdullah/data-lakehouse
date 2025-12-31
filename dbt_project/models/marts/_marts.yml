@@ -1,0 +1,87 @@
+version: 2
+
+models:
+  - name: dim_zones
+    description: Dimension table for NYC taxi zones
+    columns:
+      - name: zone_id
+        description: Unique zone identifier (primary key)
+        tests:
+          - unique
+          - not_null
+      - name: borough
+        description: NYC borough name
+        tests:
+          - not_null
+      - name: zone_name
+        description: Zone/neighborhood name
+        tests:
+          - not_null
+      - name: service_zone
+        description: Service zone classification (Yellow Zone, Boro Zone, Airports, etc.)
+      - name: is_airport
+        description: Whether this zone is an airport
+
+  - name: fct_daily_trips
+    description: Daily aggregated trip metrics by borough and trip type
+    columns:
+      - name: trip_date
+        description: Date of trips
+        tests:
+          - not_null
+      - name: pickup_borough
+        description: Borough where trips originated
+        tests:
+          - not_null
+      - name: trip_type
+        description: Type of taxi service (yellow, green, fhv)
+        tests:
+          - not_null
+          - accepted_values:
+              values: ["yellow", "green", "fhv"]
+      - name: total_trips
+        description: Total number of trips
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+      - name: total_passengers
+        description: Total passengers (null for FHV)
+      - name: total_distance_miles
+        description: Total distance traveled in miles
+      - name: avg_distance_miles
+        description: Average trip distance in miles
+      - name: total_fare
+        description: Total fare revenue
+      - name: avg_fare
+        description: Average fare per trip
+      - name: total_tips
+        description: Total tip amount
+      - name: avg_tip_percentage
+        description: Average tip as percentage of fare
+      - name: avg_duration_minutes
+        description: Average trip duration in minutes
+
+  - name: fct_zone_metrics
+    description: Zone-level aggregated metrics for pickup and dropoff analysis
+    columns:
+      - name: zone_id
+        description: Zone identifier
+        tests:
+          - not_null
+      - name: metric_date
+        description: Date of metrics
+        tests:
+          - not_null
+      - name: trip_type
+        description: Type of taxi service
+        tests:
+          - not_null
+      - name: pickups
+        description: Number of pickups from this zone
+      - name: dropoffs
+        description: Number of dropoffs to this zone
+      - name: total_fare_from_zone
+        description: Total fare from trips starting in this zone
+      - name: avg_fare_from_zone
+        description: Average fare from trips starting in this zone

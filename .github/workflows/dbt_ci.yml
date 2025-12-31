@@ -1,0 +1,75 @@
+name: dbt CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  PYTHON_VERSION: "3.11"
+
+jobs:
+  dbt-build-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install UV
+        uses: astral-sh/setup-uv@v4
+
+      - name: Install dependencies
+        run: uv sync
+
+      - name: Download sample data (1 month for CI speed)
+        run: |
+          mkdir -p data/raw
+          # Download only January 2024 data for faster CI
+          curl -L -o data/raw/yellow_tripdata_2024-01.parquet \
+            https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_2024-01.parquet
+          curl -L -o data/raw/green_tripdata_2024-01.parquet \
+            https://d37ci6vzurychx.cloudfront.net/trip-data/green_tripdata_2024-01.parquet
+          curl -L -o data/raw/fhv_tripdata_2024-01.parquet \
+            https://d37ci6vzurychx.cloudfront.net/trip-data/fhv_tripdata_2024-01.parquet
+          curl -L -o data/raw/taxi_zone_lookup.csv \
+            https://d37ci6vzurychx.cloudfront.net/misc/taxi_zone_lookup.csv
+
+      - name: Setup DuckDB warehouse
+        run: uv run python scripts/setup_warehouse.py
+
+      - name: Install dbt dependencies
+        working-directory: dbt_project
+        run: uv run dbt deps
+
+      - name: Load seed data
+        working-directory: dbt_project
+        run: uv run dbt seed
+
+      - name: Run dbt models
+        working-directory: dbt_project
+        run: uv run dbt run
+
+      - name: Run dbt tests
+        working-directory: dbt_project
+        run: uv run dbt test
+
+      - name: Generate dbt docs
+        working-directory: dbt_project
+        run: uv run dbt docs generate
+
+      - name: Upload dbt artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dbt-artifacts
+          path: |
+            dbt_project/target/manifest.json
+            dbt_project/target/catalog.json
+            dbt_project/target/run_results.json
+          retention-days: 7
